@@ -1,4 +1,5 @@
 use float_cmp::approx_eq;
+use std::fmt;
 
 #[derive(Debug)]
 pub(crate) struct Color {
@@ -18,6 +19,12 @@ impl Color {
 
     pub fn white() -> Self {
         Color::new(1.0, 1.0, 1.0)
+    }
+}
+
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({:.3}, {:.3}, {:.3})", self.r, self.g, self.b)
     }
 }
 
