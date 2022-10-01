@@ -2,6 +2,7 @@ use point::Point;
 use std::fmt;
 use vector::Vector;
 
+mod color;
 mod point;
 mod tuple;
 mod vector;
