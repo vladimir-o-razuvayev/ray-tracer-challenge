@@ -133,6 +133,30 @@ impl std::ops::Div<f32> for Tuple {
     }
 }
 
+impl std::ops::Index<usize> for Tuple {
+    type Output = f32;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => &self.w, // Questionable
+        }
+    }
+}
+
+impl std::ops::IndexMut<usize> for Tuple {
+    fn index_mut(&mut self, index: usize) -> &mut f32 {
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => &mut self.w, // Questionable
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{point::Point, tuple::Tuple, vector::Vector};
@@ -218,5 +242,12 @@ mod tests {
         let tuple = Tuple::new(-4.0, 2.0, 0.0, -3.0);
         let new_tuple = tuple / 2.0;
         assert_eq!(new_tuple, Tuple::new(-2.0, 1.0, 0.0, -1.5));
+    }
+    #[test]
+    fn access_tuple_by_index() {
+        let mut tuple = Tuple::new(-4.0, 2.0, 0.0, -3.0);
+        assert_eq!(tuple[3], -3.0);
+        tuple[2] = 1.0;
+        assert_eq!(tuple[2], 1.0)
     }
 }
