@@ -1,7 +1,10 @@
+use canvas::Canvas;
+use color::WHITE;
 use point::Point;
 use std::fmt;
 use vector::Vector;
 
+mod canvas;
 mod color;
 mod point;
 mod tuple;
@@ -44,16 +47,7 @@ fn tick(environment: &Environment, projectile: Projectile) -> Projectile {
 }
 
 fn main() {
-    let mut projectile = Projectile::new(
-        Point::new(0.0, 1.0, 0.0),
-        Vector::new(1.0, 1.0, 0.0).normalize(),
-    );
-    let environment = Environment::new(Vector::new(0.0, -0.1, 0.0), Vector::new(-0.01, 0.0, 0.0));
-
-    println!("Projectile: {}", projectile);
-    let mut height = projectile.position.y;
-    while height > 0.0 {
-        projectile = tick(&environment, projectile);
-        height = projectile.position.y;
-    }
+    let mut canvas = Canvas::new(20, 20);
+    canvas.write_pixel(10, 10, WHITE);
+    canvas.to_ppm().unwrap();
 }
