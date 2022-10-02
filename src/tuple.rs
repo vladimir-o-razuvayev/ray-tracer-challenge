@@ -3,17 +3,32 @@ use float_cmp::approx_eq;
 use crate::point::Point;
 use crate::vector::Vector;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct Tuple {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-    pub w: f32,
+    data: Vec<f32>,
 }
 
 impl Tuple {
     pub fn new(x: f32, y: f32, z: f32, w: f32) -> Self {
-        Tuple { x, y, z, w }
+        Tuple {
+            data: vec![x, y, z, w],
+        }
+    }
+
+    pub fn x(self) -> f32 {
+        self.data[0]
+    }
+
+    pub fn y(self) -> f32 {
+        self.data[1]
+    }
+
+    pub fn z(self) -> f32 {
+        self.data[2]
+    }
+
+    pub fn w(self) -> f32 {
+        self.data[3]
     }
 
     pub fn zero() -> Self {
@@ -21,7 +36,11 @@ impl Tuple {
     }
 
     pub fn magnitude(&self) -> f32 {
-        ((self.x * self.x) + (self.y * self.y) + (self.z * self.z) + (self.w * self.w)).sqrt()
+        ((self.x() * self.x())
+            + (self.y() * self.y())
+            + (self.z() * self.z())
+            + (self.w() * self.w()))
+        .sqrt()
     }
 
     pub fn normalize(self) -> Self {
@@ -32,10 +51,10 @@ impl Tuple {
 
 impl PartialEq for Tuple {
     fn eq(&self, t: &Tuple) -> bool {
-        approx_eq!(f32, self.x, t.x)
-            && approx_eq!(f32, self.y, t.y)
-            && approx_eq!(f32, self.z, t.z)
-            && approx_eq!(f32, self.w, t.w)
+        approx_eq!(f32, self.x(), t.x())
+            && approx_eq!(f32, self.y(), t.y())
+            && approx_eq!(f32, self.z(), t.z())
+            && approx_eq!(f32, self.w(), t.w())
     }
 }
 
@@ -56,10 +75,10 @@ impl std::ops::Add<Tuple> for Tuple {
 
     fn add(self, rhs: Tuple) -> Self::Output {
         Tuple::new(
-            self.x + rhs.x,
-            self.y + rhs.y,
-            self.z + rhs.z,
-            self.w + rhs.w,
+            self.x() + rhs.x(),
+            self.y() + rhs.y(),
+            self.z() + rhs.z(),
+            self.w() + rhs.w(),
         )
     }
 }
@@ -68,7 +87,12 @@ impl std::ops::Add<Vector> for Tuple {
     type Output = Tuple;
 
     fn add(self, rhs: Vector) -> Self::Output {
-        Tuple::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z, self.w)
+        Tuple::new(
+            self.x() + rhs.x,
+            self.y() + rhs.y,
+            self.z() + rhs.z,
+            self.w(),
+        )
     }
 }
 
@@ -76,7 +100,12 @@ impl std::ops::Add<Point> for Tuple {
     type Output = Tuple;
 
     fn add(self, rhs: Point) -> Self::Output {
-        Tuple::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z, self.w + 1.0)
+        Tuple::new(
+            self.x() + rhs.x,
+            self.y() + rhs.y,
+            self.z() + rhs.z,
+            self.w() + 1.0,
+        )
     }
 }
 
@@ -85,10 +114,10 @@ impl std::ops::Sub<Tuple> for Tuple {
 
     fn sub(self, rhs: Tuple) -> Self::Output {
         Tuple::new(
-            self.x - rhs.x,
-            self.y - rhs.y,
-            self.z - rhs.z,
-            self.w - rhs.w,
+            self.x() - rhs.x(),
+            self.y() - rhs.y(),
+            self.z() - rhs.z(),
+            self.w() - rhs.w(),
         )
     }
 }
@@ -97,7 +126,12 @@ impl std::ops::Sub<Vector> for Tuple {
     type Output = Tuple;
 
     fn sub(self, rhs: Vector) -> Self::Output {
-        Tuple::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, self.w)
+        Tuple::new(
+            self.x() - rhs.x,
+            self.y() - rhs.y,
+            self.z() - rhs.z,
+            self.w(),
+        )
     }
 }
 
@@ -105,7 +139,12 @@ impl std::ops::Sub<Point> for Tuple {
     type Output = Tuple;
 
     fn sub(self, rhs: Point) -> Self::Output {
-        Tuple::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, self.w - 1.0)
+        Tuple::new(
+            self.x() - rhs.x,
+            self.y() - rhs.y,
+            self.z() - rhs.z,
+            self.w() - 1.0,
+        )
     }
 }
 
@@ -121,7 +160,12 @@ impl std::ops::Mul<f32> for Tuple {
     type Output = Tuple;
 
     fn mul(self, rhs: f32) -> Self::Output {
-        Tuple::new(self.x * rhs, self.y * rhs, self.z * rhs, self.w * rhs)
+        Tuple::new(
+            self.x() * rhs,
+            self.y() * rhs,
+            self.z() * rhs,
+            self.w() * rhs,
+        )
     }
 }
 
@@ -129,7 +173,12 @@ impl std::ops::Div<f32> for Tuple {
     type Output = Tuple;
 
     fn div(self, rhs: f32) -> Self::Output {
-        Tuple::new(self.x / rhs, self.y / rhs, self.z / rhs, self.w / rhs)
+        Tuple::new(
+            self.x() / rhs,
+            self.y() / rhs,
+            self.z() / rhs,
+            self.w() / rhs,
+        )
     }
 }
 
@@ -137,23 +186,13 @@ impl std::ops::Index<usize> for Tuple {
     type Output = f32;
 
     fn index(&self, index: usize) -> &Self::Output {
-        match index {
-            0 => &self.x,
-            1 => &self.y,
-            2 => &self.z,
-            _ => &self.w, // Questionable
-        }
+        &self.data[index]
     }
 }
 
 impl std::ops::IndexMut<usize> for Tuple {
     fn index_mut(&mut self, index: usize) -> &mut f32 {
-        match index {
-            0 => &mut self.x,
-            1 => &mut self.y,
-            2 => &mut self.z,
-            _ => &mut self.w, // Questionable
-        }
+        &mut self.data[index]
     }
 }
 
