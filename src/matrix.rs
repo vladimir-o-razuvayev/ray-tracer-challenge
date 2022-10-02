@@ -1,5 +1,29 @@
 use crate::tuple::Tuple;
 
+pub(crate) enum MixedTuples {
+    TwoTuple(Tuple, Tuple),
+    ThreeTuple(Tuple, Tuple, Tuple),
+    FourTuple(Tuple, Tuple, Tuple, Tuple),
+}
+
+impl From<(Tuple, Tuple)> for MixedTuples {
+    fn from((a, b): (Tuple, Tuple)) -> MixedTuples {
+        MixedTuples::TwoTuple(a, b)
+    }
+}
+
+impl From<(Tuple, Tuple, Tuple)> for MixedTuples {
+    fn from((a, b, c): (Tuple, Tuple, Tuple)) -> MixedTuples {
+        MixedTuples::ThreeTuple(a, b, c)
+    }
+}
+
+impl From<(Tuple, Tuple, Tuple, Tuple)> for MixedTuples {
+    fn from((a, b, c, d): (Tuple, Tuple, Tuple, Tuple)) -> MixedTuples {
+        MixedTuples::FourTuple(a, b, c, d)
+    }
+}
+
 #[derive(Debug)]
 pub(crate) struct Matrix {
     width: usize,
@@ -8,11 +32,26 @@ pub(crate) struct Matrix {
 }
 
 impl Matrix {
-    pub fn new(width: usize, height: usize) -> Self {
-        Matrix {
-            width,
-            height,
-            data: vec![Tuple::zero(); width * height],
+    pub fn new<A>(data: A) -> Self
+    where
+        A: Into<MixedTuples>,
+    {
+        match data.into() {
+            MixedTuples::TwoTuple(a, b) => Matrix {
+                width: 2,
+                height: 2,
+                data: vec![a, b],
+            },
+            MixedTuples::ThreeTuple(a, b, c) => Matrix {
+                width: 3,
+                height: 3,
+                data: vec![a, b, c],
+            },
+            MixedTuples::FourTuple(a, b, c, d) => Matrix {
+                width: 4,
+                height: 4,
+                data: vec![a, b, c, d],
+            },
         }
     }
 }
@@ -43,66 +82,55 @@ mod tests {
 
     #[test]
     fn two_matrices_approx_eq() {
-        let tuple0 = Tuple::new(1.0, 2.0, 3.0, 4.0);
-        let tuple1 = Tuple::new(5.5, 6.5, 7.5, 8.5);
-        let tuple2 = Tuple::new(9.0, 10.0, 11.0, 12.0);
-        let tuple3 = Tuple::new(13.5, 14.5, 15.5, 16.5);
+        let matrix1 = Matrix::new((
+            Tuple::new(1.0, 2.0, 3.0, 4.0),
+            Tuple::new(5.5, 6.5, 7.5, 8.5),
+            Tuple::new(9.0, 10.0, 11.0, 12.0),
+            Tuple::new(13.5, 14.5, 15.5, 16.5),
+        ));
 
-        let mut matrix1 = Matrix::new(4, 4);
-        let mut matrix2 = Matrix::new(4, 4);
-
-        matrix1[0] = tuple0;
-        matrix1[1] = tuple1;
-        matrix1[2] = tuple2;
-        matrix1[3] = tuple3;
-
-        matrix2[0] = tuple0 * 1.000000001;
-        matrix2[1] = tuple1 * 0.9999999;
-        matrix2[2] = tuple2;
-        matrix2[3] = tuple3;
+        let matrix2 = Matrix::new((
+            Tuple::new(1.0, 2.0, 3.0, 4.0) * 1.000000001,
+            Tuple::new(5.5, 6.5, 7.5, 8.5) * 0.9999999,
+            Tuple::new(9.0, 10.0, 11.0, 12.0),
+            Tuple::new(13.5, 14.5, 15.5, 16.5),
+        ));
 
         assert_eq!(matrix1, matrix2)
     }
 
     #[test]
     fn two_matrices_approx_ne() {
-        let tuple0 = Tuple::new(1.0, 2.0, 3.0, 4.0);
-        let tuple1 = Tuple::new(5.5, 6.5, 7.5, 8.5);
-        let tuple2 = Tuple::new(9.0, 10.0, 11.0, 12.0);
-        let tuple3 = Tuple::new(13.5, 14.5, 15.5, 16.5);
+        let matrix1 = Matrix::new((
+            Tuple::new(1.0, 2.0, 3.0, 4.0),
+            Tuple::new(5.5, 6.5, 7.5, 8.5),
+            Tuple::new(9.0, 10.0, 11.0, 12.0),
+            Tuple::new(13.5, 14.5, 15.5, 16.5),
+        ));
 
-        let mut matrix1 = Matrix::new(4, 4);
-        let mut matrix2 = Matrix::new(4, 4);
-
-        matrix1[0] = tuple0;
-        matrix1[1] = tuple1;
-        matrix1[2] = tuple2;
-        matrix1[3] = tuple3;
-
-        matrix2[0] = tuple0 * 0.5;
-        matrix2[1] = tuple1;
-        matrix2[2] = tuple2;
-        matrix2[3] = tuple3;
+        let matrix2 = Matrix::new((
+            Tuple::new(1.0, 2.0, 3.0, 4.0) * 0.5,
+            Tuple::new(5.5, 6.5, 7.5, 8.5),
+            Tuple::new(9.0, 10.0, 11.0, 12.0),
+            Tuple::new(13.5, 14.5, 15.5, 16.5),
+        ));
 
         assert_ne!(matrix1, matrix2)
     }
 
     #[test]
     fn access_matrix_by_index() {
-        let tuple0 = Tuple::new(1.0, 2.0, 3.0, 4.0);
-        let tuple1 = Tuple::new(5.5, 6.5, 7.5, 8.5);
-        let tuple2 = Tuple::new(9.0, 10.0, 11.0, 12.0);
-        let tuple3 = Tuple::new(13.5, 14.5, 15.5, 16.5);
-        let mut matrix = Matrix::new(4, 4);
+        let mut matrix = Matrix::new((
+            Tuple::new(1.0, 2.0, 3.0, 4.0),
+            Tuple::new(5.5, 6.5, 7.5, 8.5),
+            Tuple::new(9.0, 10.0, 11.0, 12.0),
+            Tuple::new(13.5, 14.5, 15.5, 16.5),
+        ));
 
-        matrix[0] = tuple0;
-        matrix[1] = tuple1;
-        matrix[2] = tuple2;
-        matrix[3] = tuple3;
-
-        assert_eq!(matrix[0][1], 2.0);
-        assert_eq!(matrix[1][0], 5.5);
-        assert_eq!(matrix[2][2], 11.0);
         assert_eq!(matrix[3][3], 16.5);
+
+        matrix[0][1] = 0.0;
+
+        assert_eq!(matrix[0][1], 0.0);
     }
 }
