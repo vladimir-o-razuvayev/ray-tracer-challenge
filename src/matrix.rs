@@ -78,22 +78,23 @@ impl std::ops::IndexMut<usize> for Matrix {
 
 #[cfg(test)]
 mod tests {
-    use crate::{matrix::Matrix, point::Point, tuple::Tuple, vector::Vector};
+
+    use crate::{matrix::Matrix, point::Point, tup, tuple::Tuple, vector::Vector};
 
     #[test]
     fn two_matrices_approx_eq() {
         let matrix1 = Matrix::new((
-            Tuple::new((1.0, 2.0, 3.0, 4.0)),
-            Tuple::new((5.5, 6.5, 7.5, 8.5)),
-            Tuple::new((9.0, 10.0, 11.0, 12.0)),
-            Tuple::new((13.5, 14.5, 15.5, 16.5)),
+            tup![1.0, 2.0, 3.0, 4.0],
+            tup![5.5, 6.5, 7.5, 8.5],
+            tup![9.0, 10.0, 11.0, 12.0],
+            tup![13.5, 14.5, 15.5, 16.5],
         ));
 
         let matrix2 = Matrix::new((
-            Tuple::new((1.0, 2.0, 3.0, 4.0)) * 0.9999999,
-            Tuple::new((5.5, 6.5, 7.5, 8.5)) * 1.0000001,
-            Tuple::new((9.0, 10.0, 11.0, 12.0)),
-            Tuple::new((13.5, 14.5, 15.5, 16.5)),
+            tup![1.0, 2.0, 3.0, 4.0] * 0.9999999,
+            tup![5.5, 6.5, 7.5, 8.5] * 1.0000001,
+            tup![9.0, 10.0, 11.0, 12.0],
+            tup![13.5, 14.5, 15.5, 16.5],
         ));
 
         assert_eq!(matrix1, matrix2)
@@ -102,17 +103,17 @@ mod tests {
     #[test]
     fn two_matrices_approx_ne() {
         let matrix1 = Matrix::new((
-            Tuple::new((1.0, 2.0, 3.0, 4.0)),
-            Tuple::new((5.5, 6.5, 7.5, 8.5)),
-            Tuple::new((9.0, 10.0, 11.0, 12.0)),
-            Tuple::new((13.5, 14.5, 15.5, 16.5)),
+            tup![1.0, 2.0, 3.0, 4.0],
+            tup![5.5, 6.5, 7.5, 8.5],
+            tup![9.0, 10.0, 11.0, 12.0],
+            tup![13.5, 14.5, 15.5, 16.5],
         ));
 
         let matrix2 = Matrix::new((
-            Tuple::new((1.0, 2.0, 3.0, 4.0)) * 0.5,
-            Tuple::new((5.5, 6.5, 7.5, 8.5)),
-            Tuple::new((9.0, 10.0, 11.0, 12.0)),
-            Tuple::new((13.5, 14.5, 15.5, 16.5)),
+            tup![1.0, 2.0, 3.0, 4.0] * 0.5,
+            tup![5.5, 6.5, 7.5, 8.5],
+            tup![9.0, 10.0, 11.0, 12.0],
+            tup![13.5, 14.5, 15.5, 16.5],
         ));
 
         assert_ne!(matrix1, matrix2)
@@ -121,10 +122,10 @@ mod tests {
     #[test]
     fn access_matrix_by_index() {
         let mut matrix = Matrix::new((
-            Tuple::new((1.0, 2.0, 3.0, 4.0)),
-            Tuple::new((5.5, 6.5, 7.5, 8.5)),
-            Tuple::new((9.0, 10.0, 11.0, 12.0)),
-            Tuple::new((13.5, 14.5, 15.5, 16.5)),
+            tup![1.0, 2.0, 3.0, 4.0],
+            tup![5.5, 6.5, 7.5, 8.5],
+            tup![9.0, 10.0, 11.0, 12.0],
+            tup![13.5, 14.5, 15.5, 16.5],
         ));
 
         assert_eq!(matrix[3][3], 16.5);

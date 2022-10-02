@@ -1,4 +1,4 @@
-use crate::{tuple::Tuple, vector::Vector};
+use crate::{tup, tuple::Tuple, vector::Vector};
 use float_cmp::approx_eq;
 use std::fmt;
 
@@ -66,7 +66,7 @@ impl std::ops::Add<Point> for Point {
     type Output = Tuple;
 
     fn add(self, rhs: Point) -> Self::Output {
-        Tuple::new((self.x + rhs.x, self.y + rhs.y, self.z + rhs.z, 2.0))
+        tup![self.x + rhs.x, self.y + rhs.y, self.z + rhs.z, 2.0]
     }
 }
 
@@ -90,13 +90,13 @@ impl std::ops::Neg for Point {
     type Output = Tuple;
 
     fn neg(self) -> Self::Output {
-        Tuple::new((-self.x, -self.y, -self.z, -1.0))
+        tup![-self.x, -self.y, -self.z, -1.0]
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{point::Point, tuple::Tuple, vector::Vector};
+    use crate::{point::Point, tup, tuple::Tuple, vector::Vector};
 
     #[test]
     fn point_has_w_eq_1() {
@@ -108,8 +108,8 @@ mod tests {
     }
     #[test]
     fn try_point_from_tuple() {
-        let ok_point = Point::try_from(Tuple::new((0.0, -1.0, 2.0, 1.0)));
-        let err_point = Point::try_from(Tuple::new((0.0, -1.0, 2.0, 0.0)));
+        let ok_point = Point::try_from(tup![0.0, -1.0, 2.0, 1.0]);
+        let err_point = Point::try_from(tup![0.0, -1.0, 2.0, 0.0]);
         assert!(ok_point.is_ok());
         if let Ok(point) = ok_point {
             assert_eq!(point, Point::new(0.0, -1.0, 2.0));
@@ -140,7 +140,7 @@ mod tests {
         let point1 = Point::new(0.0, 2.0, 3.0);
         let point2 = Point::new(-4.0, 2.0, -3.0);
         let new_tuple = point1 + point2;
-        assert_eq!(new_tuple, Tuple::new((-4.0, 4.0, 0.0, 2.0)));
+        assert_eq!(new_tuple, tup![-4.0, 4.0, 0.0, 2.0]);
     }
     #[test]
     fn sub_vector_from_point() {
@@ -160,6 +160,6 @@ mod tests {
     fn neg_point() {
         let point = Point::new(-4.0, 2.0, 0.0);
         let new_tuple = -point;
-        assert_eq!(new_tuple, Tuple::new((4.0, -2.0, 0.0, -1.0)));
+        assert_eq!(new_tuple, tup![4.0, -2.0, 0.0, -1.0]);
     }
 }
