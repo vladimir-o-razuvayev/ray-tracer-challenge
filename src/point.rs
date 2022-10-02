@@ -38,7 +38,7 @@ impl TryFrom<Tuple> for Point {
         if t.size() != 4 {
             return Err(IntoPointError::WrongLength);
         }
-        if t[3] == 1.0 {
+        if approx_eq!(f32, t[3], 1.0) {
             return Ok(Point::new(t[0], t[1], t[2]));
         } else {
         }

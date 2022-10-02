@@ -59,7 +59,7 @@ impl TryFrom<Tuple> for Vector {
         if t.size() != 4 {
             return Err(IntoVectorError::WrongLength);
         }
-        if t[3] == 0.0 {
+        if approx_eq!(f32, t[3], 0.0) {
             return Ok(Vector::new(t[0], t[1], t[2]));
         }
         Err(IntoVectorError::BadW)
