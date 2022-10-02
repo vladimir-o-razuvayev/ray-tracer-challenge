@@ -27,6 +27,23 @@ impl Matrix {
              0.0, 0.0, 0.0, 0.0;
              0.0, 0.0, 0.0, 0.0]
     }
+
+    pub fn identity() -> Self {
+        mat![1.0, 0.0, 0.0, 0.0;
+             0.0, 1.0, 0.0, 0.0;
+             0.0, 0.0, 1.0, 0.0;
+             0.0, 0.0, 0.0, 1.0]
+    }
+
+    pub fn transpose(&self) -> Self {
+        let mut matrix = Matrix::zero();
+        for row in 0..4 {
+            for col in 0..4 {
+                matrix[row][col] = self[col][row];
+            }
+        }
+        matrix
+    }
 }
 
 impl PartialEq for Matrix {
@@ -104,7 +121,7 @@ impl std::ops::Mul<Tuple> for Matrix {
             (self[3][0] * rhs[0])
                 + (self[3][1] * rhs[1])
                 + (self[3][2] * rhs[2])
-                + (self[2][3] * rhs[3])
+                + (self[3][3] * rhs[3])
         ]
     }
 }
@@ -182,6 +199,26 @@ mod tests {
                           0.0, 0.0, 0.0, 1.0];
         let tuple = tup![1.0, 2.0, 3.0, 1.0];
         assert_eq!(matrix * tuple, tup![18.0, 24.0, 33.0, 1.0]);
+    }
+    #[test]
+    fn mult_identity_matrix_by_tuple() {
+        let matrix = Matrix::identity();
+        let tuple = tup![1.0, 2.0, 3.0, 1.0];
+        assert_eq!(matrix * tuple, tup![1.0, 2.0, 3.0, 1.0]);
+    }
+    #[test]
+    fn transpose_matrix() {
+        let matrix = mat![1.0, 2.0, 3.0, 4.0;
+                          2.0, 4.0, 4.0, 2.0;
+                          8.0, 6.0, 4.0, 1.0;
+                          0.0, 0.0, 0.0, 1.0];
+        assert_eq!(
+            matrix.transpose(),
+            mat![1.0, 2.0, 8.0, 0.0;
+                 2.0, 4.0, 6.0, 0.0;
+                 3.0, 4.0, 4.0, 0.0;
+                 4.0, 2.0, 1.0, 1.0]
+        );
     }
     #[test]
     fn access_matrix_by_index() {
