@@ -3,7 +3,7 @@ use float_cmp::approx_eq;
 use crate::point::Point;
 use crate::vector::Vector;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct Tuple {
     pub x: f32,
     pub y: f32,

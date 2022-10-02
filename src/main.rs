@@ -6,6 +6,7 @@ use vector::Vector;
 
 mod canvas;
 mod color;
+mod matrix;
 mod point;
 mod tuple;
 mod vector;
