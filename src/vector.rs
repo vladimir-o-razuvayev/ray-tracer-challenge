@@ -13,6 +13,7 @@ pub(crate) struct Vector {
 pub(crate) enum IntoVectorError {
     // W not 0.0
     BadW,
+    WrongLength,
 }
 
 impl Vector {
@@ -55,8 +56,11 @@ impl fmt::Display for Vector {
 impl TryFrom<Tuple> for Vector {
     type Error = IntoVectorError;
     fn try_from(t: Tuple) -> Result<Self, Self::Error> {
-        if t.w == 0.0 {
-            return Ok(Vector::new(t.x, t.y, t.z));
+        if t.size() != 4 {
+            return Err(IntoVectorError::WrongLength);
+        }
+        if t[3] == 0.0 {
+            return Ok(Vector::new(t[0], t[1], t[2]));
         }
         Err(IntoVectorError::BadW)
     }
@@ -86,14 +90,6 @@ impl std::ops::Add<Point> for Vector {
     }
 }
 
-impl std::ops::Add<Tuple> for Vector {
-    type Output = Tuple;
-
-    fn add(self, rhs: Tuple) -> Self::Output {
-        Tuple::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z, rhs.w)
-    }
-}
-
 impl std::ops::Sub<Vector> for Vector {
     type Output = Vector;
 
@@ -106,15 +102,7 @@ impl std::ops::Sub<Point> for Vector {
     type Output = Tuple;
 
     fn sub(self, rhs: Point) -> Self::Output {
-        Tuple::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, -1.0)
-    }
-}
-
-impl std::ops::Sub<Tuple> for Vector {
-    type Output = Tuple;
-
-    fn sub(self, rhs: Tuple) -> Self::Output {
-        Tuple::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, -rhs.w)
+        Tuple::new((self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, -1.0))
     }
 }
 
@@ -176,8 +164,8 @@ mod tests {
     }
     #[test]
     fn try_vector_from_tuple() {
-        let ok_vector = Vector::try_from(Tuple::new(0.0, -1.0, 2.0, 0.0));
-        let err_vector = Vector::try_from(Tuple::new(0.0, -1.0, 2.0, 1.0));
+        let ok_vector = Vector::try_from(Tuple::new((0.0, -1.0, 2.0, 0.0)));
+        let err_vector = Vector::try_from(Tuple::new((0.0, -1.0, 2.0, 1.0)));
         assert!(ok_vector.is_ok());
         if let Ok(vector) = ok_vector {
             assert_eq!(vector, Vector::new(0.0, -1.0, 2.0));
@@ -213,13 +201,6 @@ mod tests {
         assert_eq!(new_point.w, 1.0);
     }
     #[test]
-    fn add_tuple_to_vector() {
-        let vector = Vector::new(-4.0, 2.0, -3.0);
-        let tuple = Tuple::new(0.0, 2.0, 3.0, 4.0);
-        let new_tuple = vector + tuple;
-        assert_eq!(new_tuple, Tuple::new(-4.0, 4.0, 0.0, 4.0));
-    }
-    #[test]
     fn sub_two_vectors() {
         let vector1 = Vector::new(-4.0, 2.0, -3.0);
         let vector2 = Vector::new(0.0, 2.0, 3.0);
@@ -232,14 +213,7 @@ mod tests {
         let vector = Vector::new(-4.0, 2.0, -3.0);
         let point = Point::new(0.0, 2.0, 3.0);
         let new_tuple = vector - point;
-        assert_eq!(new_tuple, Tuple::new(-4.0, 0.0, -6.0, -1.0));
-    }
-    #[test]
-    fn sub_tuple_from_vector() {
-        let vector = Vector::new(-4.0, 2.0, -3.0);
-        let tuple = Tuple::new(0.0, 2.0, 3.0, 4.0);
-        let new_tuple = vector - tuple;
-        assert_eq!(new_tuple, Tuple::new(-4.0, 0.0, -6.0, -4.0));
+        assert_eq!(new_tuple, Tuple::new((-4.0, 0.0, -6.0, -1.0)));
     }
     #[test]
     fn neg_vector() {

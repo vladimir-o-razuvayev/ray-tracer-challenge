@@ -64,16 +64,23 @@ impl Tuple {
         self.data[3]
     }
 
-    pub fn zero() -> Self {
-        Tuple::new((0.0, 0.0, 0.0, 0.0))
+    pub fn size(&self) -> usize {
+        self.data.len()
+    }
+
+    pub fn fill(v: Vec<f32>) -> Self {
+        Tuple { data: v }
+    }
+
+    pub fn zero(length: usize) -> Self {
+        Tuple::fill(vec![0.0; length])
     }
 
     pub fn magnitude(&self) -> f32 {
-        ((self.x() * self.x())
-            + (self.y() * self.y())
-            + (self.z() * self.z())
-            + (self.w() * self.w()))
-        .sqrt()
+        self.data
+            .iter()
+            .fold(0.0, |acc, value| acc + (value * value))
+            .sqrt()
     }
 
     pub fn normalize(self) -> Self {
@@ -84,10 +91,10 @@ impl Tuple {
 
 impl PartialEq for Tuple {
     fn eq(&self, t: &Tuple) -> bool {
-        approx_eq!(f32, self.x(), t.x())
-            && approx_eq!(f32, self.y(), t.y())
-            && approx_eq!(f32, self.z(), t.z())
-            && approx_eq!(f32, self.w(), t.w())
+        self.data
+            .iter()
+            .zip(t.data.iter())
+            .fold(true, |acc, (v1, v2)| acc && approx_eq!(f32, *v1, *v2))
     }
 }
 
@@ -107,38 +114,13 @@ impl std::ops::Add<Tuple> for Tuple {
     type Output = Tuple;
 
     fn add(self, rhs: Tuple) -> Self::Output {
-        Tuple::new((
-            self.x() + rhs.x(),
-            self.y() + rhs.y(),
-            self.z() + rhs.z(),
-            self.w() + rhs.w(),
-        ))
-    }
-}
-
-impl std::ops::Add<Vector> for Tuple {
-    type Output = Tuple;
-
-    fn add(self, rhs: Vector) -> Self::Output {
-        Tuple::new((
-            self.x() + rhs.x,
-            self.y() + rhs.y,
-            self.z() + rhs.z,
-            self.w(),
-        ))
-    }
-}
-
-impl std::ops::Add<Point> for Tuple {
-    type Output = Tuple;
-
-    fn add(self, rhs: Point) -> Self::Output {
-        Tuple::new((
-            self.x() + rhs.x,
-            self.y() + rhs.y,
-            self.z() + rhs.z,
-            self.w() + 1.0,
-        ))
+        Tuple::fill(
+            self.data
+                .iter()
+                .zip(rhs.data.iter())
+                .map(|(v1, v2)| v1 + v2)
+                .collect(),
+        )
     }
 }
 
@@ -146,38 +128,13 @@ impl std::ops::Sub<Tuple> for Tuple {
     type Output = Tuple;
 
     fn sub(self, rhs: Tuple) -> Self::Output {
-        Tuple::new((
-            self.x() - rhs.x(),
-            self.y() - rhs.y(),
-            self.z() - rhs.z(),
-            self.w() - rhs.w(),
-        ))
-    }
-}
-
-impl std::ops::Sub<Vector> for Tuple {
-    type Output = Tuple;
-
-    fn sub(self, rhs: Vector) -> Self::Output {
-        Tuple::new((
-            self.x() - rhs.x,
-            self.y() - rhs.y,
-            self.z() - rhs.z,
-            self.w(),
-        ))
-    }
-}
-
-impl std::ops::Sub<Point> for Tuple {
-    type Output = Tuple;
-
-    fn sub(self, rhs: Point) -> Self::Output {
-        Tuple::new((
-            self.x() - rhs.x,
-            self.y() - rhs.y,
-            self.z() - rhs.z,
-            self.w() - 1.0,
-        ))
+        Tuple::fill(
+            self.data
+                .iter()
+                .zip(rhs.data.iter())
+                .map(|(v1, v2)| v1 - v2)
+                .collect(),
+        )
     }
 }
 
@@ -185,7 +142,7 @@ impl std::ops::Neg for Tuple {
     type Output = Tuple;
 
     fn neg(self) -> Self::Output {
-        Tuple::zero() - self
+        Tuple::zero(self.data.len()) - self
     }
 }
 
@@ -193,12 +150,7 @@ impl std::ops::Mul<f32> for Tuple {
     type Output = Tuple;
 
     fn mul(self, rhs: f32) -> Self::Output {
-        Tuple::new((
-            self.x() * rhs,
-            self.y() * rhs,
-            self.z() * rhs,
-            self.w() * rhs,
-        ))
+        Tuple::fill(self.data.iter().map(|value| value * rhs).collect())
     }
 }
 
@@ -206,12 +158,7 @@ impl std::ops::Div<f32> for Tuple {
     type Output = Tuple;
 
     fn div(self, rhs: f32) -> Self::Output {
-        Tuple::new((
-            self.x() / rhs,
-            self.y() / rhs,
-            self.z() / rhs,
-            self.w() / rhs,
-        ))
+        Tuple::fill(self.data.iter().map(|value| value / rhs).collect())
     }
 }
 
@@ -263,39 +210,11 @@ mod tests {
         assert_eq!(new_tuple, Tuple::new((-4.0, 4.0, 0.0, -5.0)));
     }
     #[test]
-    fn add_vector_to_tuple() {
-        let tuple = Tuple::new((-4.0, 2.0, -3.0, -4.0));
-        let vector = Vector::new(0.0, 2.0, 3.0);
-        let new_tuple = tuple + vector;
-        assert_eq!(new_tuple, Tuple::new((-4.0, 4.0, 0.0, -4.0)));
-    }
-    #[test]
-    fn add_point_to_tuple() {
-        let tuple = Tuple::new((-4.0, 2.0, -3.0, -4.0));
-        let point = Point::new(0.0, 2.0, 3.0);
-        let new_tuple = tuple + point;
-        assert_eq!(new_tuple, Tuple::new((-4.0, 4.0, 0.0, -3.0)));
-    }
-    #[test]
     fn sub_two_tuples() {
         let tuple1 = Tuple::new((-4.0, 2.0, -3.0, -4.0));
         let tuple2 = Tuple::new((0.0, 2.0, 3.0, -1.0));
         let new_tuple = tuple1 - tuple2;
         assert_eq!(new_tuple, Tuple::new((-4.0, 0.0, -6.0, -3.0)));
-    }
-    #[test]
-    fn sub_vector_from_tuple() {
-        let tuple = Tuple::new((-4.0, 2.0, -3.0, -4.0));
-        let vector = Vector::new(0.0, 2.0, 3.0);
-        let new_tuple = tuple - vector;
-        assert_eq!(new_tuple, Tuple::new((-4.0, 0.0, -6.0, -4.0)));
-    }
-    #[test]
-    fn sub_point_from_tuple() {
-        let tuple = Tuple::new((-4.0, 2.0, -3.0, -4.0));
-        let point = Point::new(0.0, 2.0, 3.0);
-        let new_tuple = tuple - point;
-        assert_eq!(new_tuple, Tuple::new((-4.0, 0.0, -6.0, -5.0)));
     }
     #[test]
     fn neg_tuple() {
