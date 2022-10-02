@@ -20,12 +20,12 @@ impl Canvas {
 
     pub fn write_pixel(&mut self, x: usize, y: usize, color: Color) {
         if x < self.width && y < self.height {
-            self.pixels[x + y] = color;
+            self.pixels[x + y * self.width] = color;
         }
     }
 
     pub fn pixel_at(&self, x: usize, y: usize) -> Color {
-        match self.pixels.get(x + y) {
+        match self.pixels.get(x + y * self.width) {
             Some(color) => color.clone(),
             None => BLACK,
         }
