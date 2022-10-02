@@ -1,7 +1,11 @@
+use canvas::Canvas;
+use color::WHITE;
 use point::Point;
 use std::fmt;
 use vector::Vector;
 
+mod canvas;
+mod color;
 mod point;
 mod tuple;
 mod vector;
@@ -38,21 +42,35 @@ fn tick(environment: &Environment, projectile: Projectile) -> Projectile {
     let new_position = projectile.position + projectile.velocity;
     let new_velocity = projectile.velocity + environment.gravity + environment.wind;
     let new_projectile = Projectile::new(new_position, new_velocity);
-    println!("Projectile: {}", new_projectile);
     new_projectile
 }
 
 fn main() {
+    let canvas_height: usize = 550;
+    let canvas_width: usize = 900;
+    let mut canvas = Canvas::new(canvas_width, canvas_height);
     let mut projectile = Projectile::new(
         Point::new(0.0, 1.0, 0.0),
-        Vector::new(1.0, 1.0, 0.0).normalize(),
+        Vector::new(1.0, 1.8, 0.0).normalize() * 11.25,
     );
     let environment = Environment::new(Vector::new(0.0, -0.1, 0.0), Vector::new(-0.01, 0.0, 0.0));
 
-    println!("Projectile: {}", projectile);
     let mut height = projectile.position.y;
+    canvas.write_pixel(
+        projectile.position.x as usize,
+        canvas_height - height as usize,
+        WHITE,
+    );
+
     while height > 0.0 {
         projectile = tick(&environment, projectile);
         height = projectile.position.y;
+        canvas.write_pixel(
+            projectile.position.x as usize,
+            canvas_height - height as usize,
+            WHITE,
+        );
     }
+
+    canvas.to_ppm().unwrap();
 }

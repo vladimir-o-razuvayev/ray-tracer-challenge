@@ -63,66 +63,58 @@ impl TryFrom<Tuple> for Vector {
 }
 
 impl PartialEq for Vector {
-    fn eq(&self, p: &Vector) -> bool {
-        approx_eq!(f32, self.x, p.x) && approx_eq!(f32, self.y, p.y) && approx_eq!(f32, self.z, p.z)
+    fn eq(&self, rhs: &Vector) -> bool {
+        approx_eq!(f32, self.x, rhs.x)
+            && approx_eq!(f32, self.y, rhs.y)
+            && approx_eq!(f32, self.z, rhs.z)
     }
 }
 
 impl std::ops::Add<Vector> for Vector {
     type Output = Vector;
 
-    fn add(self, other: Vector) -> Self::Output {
-        Vector::new(self.x + other.x, self.y + other.y, self.z + other.z)
+    fn add(self, rhs: Vector) -> Self::Output {
+        Vector::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
     }
 }
 
 impl std::ops::Add<Point> for Vector {
     type Output = Point;
 
-    fn add(self, other: Point) -> Self::Output {
-        Point::new(self.x + other.x, self.y + other.y, self.z + other.z)
+    fn add(self, rhs: Point) -> Self::Output {
+        Point::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
     }
 }
 
 impl std::ops::Add<Tuple> for Vector {
     type Output = Tuple;
 
-    fn add(self, other: Tuple) -> Self::Output {
-        Tuple::new(
-            self.x + other.x,
-            self.y + other.y,
-            self.z + other.z,
-            other.w,
-        )
+    fn add(self, rhs: Tuple) -> Self::Output {
+        Tuple::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z, rhs.w)
     }
 }
 
 impl std::ops::Sub<Vector> for Vector {
     type Output = Vector;
 
-    fn sub(self, other: Vector) -> Self::Output {
-        Vector::new(self.x - other.x, self.y - other.y, self.z - other.z)
+    fn sub(self, rhs: Vector) -> Self::Output {
+        Vector::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
     }
 }
 
 impl std::ops::Sub<Point> for Vector {
     type Output = Tuple;
 
-    fn sub(self, other: Point) -> Self::Output {
-        Tuple::new(self.x - other.x, self.y - other.y, self.z - other.z, -1.0)
+    fn sub(self, rhs: Point) -> Self::Output {
+        Tuple::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, -1.0)
     }
 }
 
 impl std::ops::Sub<Tuple> for Vector {
     type Output = Tuple;
 
-    fn sub(self, other: Tuple) -> Self::Output {
-        Tuple::new(
-            self.x - other.x,
-            self.y - other.y,
-            self.z - other.z,
-            -other.w,
-        )
+    fn sub(self, rhs: Tuple) -> Self::Output {
+        Tuple::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z, -rhs.w)
     }
 }
 
